@@ -1,0 +1,43 @@
+.home{
+    height: 100vh;
+    background-image: url("../../assets/Home Page.png");
+    background-position:  center;
+    background-size: auto;
+   /* background-color: #eaebd0; */
+   /* opacity: 0.25; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color:white;
+   
+    
+
+}
+
+.login{
+    padding:18px 55px;
+    background-color: #aa4013;
+    color:white;
+    font-size: 20px;
+    border-radius: 25px;
+    text-decoration: none;
+   
+   
+}
+/* https://i.pinimg.com/736x/96/5d/44/965d44f5c50b2b3dead96620d395495d.jpg */
+/* https://i.pinimg.com/1200x/16/6a/08/166a08cc35f068cbb702f035f61cb977.jpg */
+/* https://i.pinimg.com/736x/e4/32/df/e432df277a0b9a1cbd43b656018f4d25.jpg */
+/* https://i.pinimg.com/736x/99/9a/35/999a351d133f15968df26fa1a78a3ab5.jpg */
+/* https://i.pinimg.com/1200x/fa/86/ce/fa86cef8a8b7f546202c486f71221907.jpg */
+/* https://images.pexels.com/photos/13156182/pexels-photo-13156182.jpeg */
+/* https://images.pexels.com/photos/5506215/pexels-photo-5506215.jpeg */
+/* https://images.pexels.com/photos/6279955/pexels-photo-6279955.jpeg */
+/* https://images.pexels.com/photos/114979/pexels-photo-114979.jpeg */
+/* https://i.pinimg.com/1200x/f7/b0/f3/f7b0f3b6d0f48e4a30d33e121ca9f18e.jpg */
+/* https://images.pexels.com/photos/4252525/pexels-photo-4252525.jpeg
+ */
+ /* https://images.unsplash.com/photo-1736093285162-66586bdcefa5?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D */
+ /* https://i.pinimg.com/736x/85/81/37/858137259b71038c20a5f10f6195e320.jpg */
+ /* https://i.pinimg.com/1200x/1d/70/cf/1d70cfd8fb6f3ed7d98334f099e53b36.jpg */
+
+
