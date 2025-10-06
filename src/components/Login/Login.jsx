@@ -52,9 +52,7 @@ try {
             <div className="d-grid"> 
                 <button type="submit" className="btn btn-primary"> Submit</button>
             </div>
-             <p className="forgot-password">
-        New user <Link to="/register">Register Here</Link>
-      </p>
+             <p> New user <Link to="/register">Register Here</Link>  </p>
        <Signgoogle/>
         </form>
         </>

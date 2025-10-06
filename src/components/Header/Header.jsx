@@ -1,16 +1,17 @@
 import React from 'react'
 import { HiMenuAlt1 } from "react-icons/hi";
+import { BsMenuButtonWide } from "react-icons/bs";
 import './Header.css'
 const Header = () => {
   return (
     <>
     <div className="navbar">
         <nav>
-        <div className="nav-1"> <HiMenuAlt1 />
+        <div className="nav-1"> <BsMenuButtonWide />
 </div>
         <div className="nav-center"> 
            
-            <h1>  <img width={50} src="https://lh3.googleusercontent.com/a/ACg8ocKtygZ_KuOrfYoXmnBL-VG_Syyf-chdm61Rz5hZFENjDK8aKg=s96-c" alt="" /> &nbsp; Macro</h1>
+            <h1>  <img width={50} src="https://media.istockphoto.com/id/155419717/photo/peacock-feather.jpg?s=2048x2048&w=is&k=20&c=urBINkOHhD9B8ONQ9BY1vWelSmIbJR0ohAC3Xsw0BtE=" alt="" /> &nbsp; Macro</h1>
         </div>
         <div className="nav-2"> 
             <ul>
@@ -21,7 +22,7 @@ const Header = () => {
             </ul>
         </div>
     </nav>
-    <div className="line"></div>
+    {/* <div className="line"></div> */}
     </div>
     </>
   )
