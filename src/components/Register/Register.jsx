@@ -93,5 +93,5 @@ toast.success(error.message,{position:"bottom-center",});
         </>
     )
 }
-
+// edit check
 export default Register;
