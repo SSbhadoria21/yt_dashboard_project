@@ -1,3 +1,4 @@
+@import url(https://db.onlinewebfonts.com/c/1dc7840abb13fcda12aa8d1cb21fb832?family=Agrandir);
 .home{
     height: 100vh;
     
@@ -13,14 +14,65 @@
     
 
 }
+@font-face {
+    font-family: "Agrandir";
+    src: url("https://db.onlinewebfonts.com/t/1dc7840abb13fcda12aa8d1cb21fb832.eot");
+    src: url("https://db.onlinewebfonts.com/t/1dc7840abb13fcda12aa8d1cb21fb832.eot?#iefix")format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/1dc7840abb13fcda12aa8d1cb21fb832.woff2")format("woff2"),
+    url("https://db.onlinewebfonts.com/t/1dc7840abb13fcda12aa8d1cb21fb832.woff")format("woff"),
+    url("https://db.onlinewebfonts.com/t/1dc7840abb13fcda12aa8d1cb21fb832.ttf")format("truetype"),
+    url("https://db.onlinewebfonts.com/t/1dc7840abb13fcda12aa8d1cb21fb832.svg#Agrandir")format("svg");
+}
+/* @font-face {
+  font-family: 'Agrandir';
+  src: url('/fonts/agrandir/Agrandir-Regular.otf') format('opentype');
+  font-weight: 400; /* Normal weight */
+  /* font-style: normal; */
+/* } */
 
+/* @font-face {
+  font-family: 'Agrandir';
+  src: url('/fonts/agrandir/Agrandir-GrandLight.otf') format('opentype');
+  font-weight: 300; /* Light weight */
+  /* font-style: normal; */
+/* } */ 
+/* @font-face {
+  font-family: 'Agrandir';
+  src: url('/fonts/agrandir/Agrandir-TextBold.otf') format('opentype');
+  font-weight: 700; /* Bold weight */
+  /* font-style: normal;
+}  */
+/* @font-face {
+  font-family: 'Agrandir';
+  src: url('/fonts/agrandir/Agrandir-GrandHeavy.otf') format('opentype');
+  font-weight: 900; /* Black/Heavy weight */
+  /* font-style: normal; */
+/* }   */
+/* @font-face {
+  font-family: 'Agrandir';
+  src: url('/fonts/agrandir/Agrandir-ThinItalic.otf') format('opentype');
+  font-weight: 200; /* Thin weight */
+  /* font-style: italic; */
+/* }  */
 .login{
     padding:18px 55px;
     background-color: #aa4013;
     color:white;
-    font-size: 20px;
+    font-size: 3rem;
     border-radius: 25px;
     text-decoration: none;
+    /* font-family: 'Agrandir',sans-serif ; */
+    /* font-weight: 400;
+     */
+   font-family: 'CMUSansSerifMedium';
+   /* font-weight: normal;
+   font-style: normal; */
+   /* font-family: "Agrandir"; */
+    
+    
+    color: #ff33cc;
+
+    
    
    
 }
