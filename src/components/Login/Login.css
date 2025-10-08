@@ -1,0 +1,43 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root{
+    --pink-color: #ff10f0;
+}
+html,body{
+    width: 100%;
+    height: 100%;
+    background-color: black;
+
+}
+.full{
+    width: 100%;
+    height: 200vh;
+    position:absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* background-color: red; */
+}
+.header{
+    position: fixed;
+    top: 0%;
+    width: 100%;
+    height: 9vh;
+    background-color: rgba(128, 128, 128, 0.285);
+    backdrop-filter: blur(10px) ;
+}
+nav{
+display: flex;
+align-items: center;
+justify-content: space-between;
+
+}
+.nav1{
+    color: var(--pink-color);
+}
+.part1{
+    
+}

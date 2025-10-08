@@ -1,6 +1,6 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import React,{useState} from "react";
-
+import "./Login.css"
 import { Link } from "react-router";
 import { ToastContainer } from "react-toastify";
 
@@ -28,7 +28,7 @@ try {
     return(
        
         <>
-        <form onSubmit={handlesubmit}>
+        {/* <form onSubmit={handlesubmit}>
             <h3>Login</h3>
 
             <div className="mb-3"> 
@@ -54,7 +54,17 @@ try {
             </div>
              <p> New user <Link to="/register">Register Here</Link>  </p>
        <Signgoogle/>
-        </form>
+        </form> */}
+       <div className="full">
+         <div className="header">
+<nav>
+    <div className="nav1"> <h1>BIZZARA</h1></div>
+    <div className="nav2"></div>
+</nav>
+<div className="part1"> </div>
+<div className="part2"></div>
+        </div>
+       </div>
         </>
     )
 }
