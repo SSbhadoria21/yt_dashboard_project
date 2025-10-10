@@ -61,16 +61,17 @@
     font-size: 3rem;
     border-radius: 25px;
     text-decoration: none;
-    /* font-family: 'Agrandir',sans-serif ; */
-    /* font-weight: 400;
-     */
-   font-family: 'CMUSansSerifMedium';
+    font-family: 'Agrandir',sans-serif ; 
+
+    font-weight: 400;
+    
+   /* font-family: 'CMUSansSerifMedium'; */
    /* font-weight: normal;
    font-style: normal; */
    /* font-family: "Agrandir"; */
     
     
-    color: #ff33cc;
+    /* color: #ff33cc; */
 
     
    
@@ -92,4 +93,73 @@
  /* https://i.pinimg.com/736x/85/81/37/858137259b71038c20a5f10f6195e320.jpg */
  /* https://i.pinimg.com/1200x/1d/70/cf/1d70cfd8fb6f3ed7d98334f099e53b36.jpg */
 
+.main{
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 
+.top_image{
+  height: 58vh;
+  width: 100%;
+  background-image: url(../Home/study\ desk\ city\ edited\ again.jpg);
+  /* background-position: center bottom; */
+  background-position: bottom center;
+  background-size: cover;
+  object-fit: cover;
+  /* filter: blur(2px); */
+  /* opacity: 0.5; */
+}
+@font-face {
+  font-family: "cmu";
+  src: url("../Home/fonts_/CMU\ Serif\ Roman.ttf");
+}
+.top_text{
+  color: white;
+  font-size: 4.3rem;
+  position: absolute;
+  top: 23%;
+  font-family:"cmu" ;
+  text-align: center;
+  width: 100%;
+  line-height: 4.05rem;
+  font-weight: lighter;
+  letter-spacing: -3px;
+  word-spacing: -10px;
+}
+
+.intro_line{
+  color: white;
+  font-family: "Agrandir";
+  /* width: 100%; */
+  margin: 60px 130px 60px 130px;
+  font-style: italic;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+/* .get_started_btn{
+  position: relative;
+  height: 50px;
+  width: 100px;
+  margin-left: 538px;
+  background-color: #191919;
+  padding: 30px;
+  border-radius: 30%;
+  color: white;
+}
+.get{
+  position: absolute;
+  color: white;
+}
+.started{
+  position: absolute;
+  color:#ff10f0;
+} */
+
+.get_started_btn{
+  background-color: #181818;
+  height: 50px;
+  width: 100px;
+}
