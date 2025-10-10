@@ -28,7 +28,6 @@ const Signgoogle = () => {
     }
   return (
   <>
-   <p> -- or Continue With --</p>
    <div onClick={googleLogin}>Sign In With Google</div>
   </>
   )

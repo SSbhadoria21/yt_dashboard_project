@@ -1,5 +1,8 @@
 # React + Vite
 
+youtube data API key
+AIzaSyCO1udCCxDUqSzzLAIRHHvC837Z4zy0GQY
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
