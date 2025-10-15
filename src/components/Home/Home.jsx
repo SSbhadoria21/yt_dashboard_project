@@ -5,7 +5,7 @@ import { Link } from 'react-router'
 const Home = () => {
   return (
     <>
-    <div className='main'>
+    <div className='mainHome'>
 
     <div className='top_image'>
 
