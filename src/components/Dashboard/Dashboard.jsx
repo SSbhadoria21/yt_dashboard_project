@@ -18,6 +18,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   IoIosArrowBack,
 } from "react-icons/io";
+import logo from '../assets/crucible.jpeg'
 import { MdOutlineCheckBox } from "react-icons/md";
 import { FaBox, FaUser } from "react-icons/fa";
 import { CgDarkMode } from "react-icons/cg";
@@ -80,7 +81,6 @@ const Dashboard = () => {
     fetchData();
   }, [user, id]);
 
-  // Handle Video Check Toggle
   const handleCheck = async (index) => {
     if (!playlist) return;
     const updatedVideos = [...playlist.videos];
@@ -143,11 +143,11 @@ const Dashboard = () => {
       <nav className="navbar">
         <div className="nav-left">
           <img
-            src="https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg"
+            src={logo}
             alt="logo"
             className="logo"
           />
-          <h1 className="brand">BIZZARA</h1>
+          <h1 className="brand">Crucible</h1>
         </div>
         <div className="nav-right">
           <button onClick={handleLogout} className="logout-btn">
@@ -220,7 +220,7 @@ const Dashboard = () => {
         <div className="profile-icon">
           <FaUser />
         </div>
-        <h1 className="playlist-title">{playlist.title}</h1>
+        <h1 className="playlist-title text-white">{playlist.title}</h1>
 
         {/* To-Do Target */}
         <div className="todo-box">

@@ -114,13 +114,17 @@
 position: absolute;
 top: 25%;
 text-align: center;
-font-size: 3.5rem;
+font-size: 4.9rem;
+line-height: 4.5rem;
+letter-spacing: -4px;
 font-family: "cmu";
 }
 .line-text{
 width: 100%;
 text-align: center;
+font-style: italic;
 margin-top: 50px;
+
 font-family: "Agrandir";
 }
 .link-login{

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 // import {get_started} from '../Home/ss.png'
 import './Home.css'
+import logo from '../assets/crucible.jpeg'
 import { Link } from 'react-router'
 import video from './dashboardvideo.mp4'
 // import { GrDashboard } from 'react-icons/gr';
@@ -12,11 +13,11 @@ const Home = () => {
         <nav className="navbar">
         <div className="nav-left">
           <img
-            src="https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg"
+            src={logo}
             alt="logo"
             className="logo"
           />
-          <h1 className="brand text-[2.3rem]">BIZZARA</h1>
+          <h1 className="brand text-[2.3rem]">Crucible</h1>
         </div>
         <div className="nav-right">
           <img
