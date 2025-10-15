@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import { ToastContainer } from "react-toastify";
 import '../Home/photo.jpg'
 import photo from '../Home/photo.jpg'
+import logo from '../assets/crucible.jpeg'
 import { auth } from "../firebase";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -34,7 +35,7 @@ try {
          <div className="header">
 <nav>
     <div className="nav1">
-         <img width={50} src="https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg" alt="" /><h1>BIZZARA</h1>
+         <img width={50} src={logo} alt="" /><h1>Crucible</h1>
          </div>
     <div className="nav2"> 
         <img width={60} height={60} src="https://freedesignfile.com/image/preview/19038/xbox-controller-gamepad-drawing-black-and-white-clipart.png" alt="" />

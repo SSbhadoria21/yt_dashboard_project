@@ -10,7 +10,7 @@ import {auth,db} from '../firebase'
 import {collection,doc,getDoc,getDocs} from 'firebase/firestore'
 import './Profile.css'
 import { BiFoodMenu } from "react-icons/bi";
-import AddPlaylist from './Addplaylist';
+import AddPlaylist from './AddPlaylist'
 import { Navigate, useNavigate } from 'react-router';
 import { useAuth } from '../context/AuthContext';
 
@@ -146,6 +146,8 @@ async function handleLogout() {
           onClick={() => setShowModal(true)}
           className=""
           >
+          className="bg-green-500 text-white px-4 py-2 rounded-md "
+        >
           + Add Playlist
         </button>
       </div>
