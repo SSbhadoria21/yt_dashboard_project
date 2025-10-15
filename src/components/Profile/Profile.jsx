@@ -1,4 +1,11 @@
 import React,{useEffect, useState} from 'react'
+import { HiWrenchScrewdriver } from "react-icons/hi2";
+import { CgDarkMode } from "react-icons/cg";
+import { FaBox } from "react-icons/fa";
+import { MdOutlineCheckBox } from "react-icons/md";
+import { IoChevronBackOutline } from "react-icons/io5";
+import { FaRegUser } from "react-icons/fa";
+import { ImHome } from "react-icons/im";
 import {auth,db} from '../firebase'
 import {collection,doc,getDoc,getDocs} from 'firebase/firestore'
 import './Profile.css'
@@ -83,47 +90,69 @@ async function handleLogout() {
       
 
 
-(
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Your Playlists</h1>
+( <div className='main-this'>
+  {/* <div className='top'>
+    <ImHome />
+    <div>
+      <FaRegUser />
+    </div>
+  </div> */}
+<div className='left'>
+  <div className='left-top'>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+  <ImHome />
+  <IoChevronBackOutline />
+  <MdOutlineCheckBox />
+  <FaBox />
+  <CgDarkMode />
+  </div>
+  <div className='left-btm'>
+    <HiWrenchScrewdriver />
+  </div>
+</div>
+    <div className='right'>
+      <h1 className="text-2xl font-bold mb-4 text-white headingYP">Your Playground
+        <FaRegUser />
+      </h1>
+
+      <div className="thumbnails">
         {playlists.map((p) => (
           <div
-            key={p.id}
-            onClick={() => Navigate(`/dashboard/${p.id}`)}
-            className="border rounded-lg cursor-pointer hover:shadow-lg transition"
+          key={p.id}
+          onClick={() => Navigate(`/dashboard/${p.id}`)}
+          className="cursor-pointer hover:shadow-lg transition oneBox"
           >
             <img
               src={p.thumbnail}
               alt={p.title}
-              className="w-full h-40 object-cover rounded-t-lg"
-            />
-            <div className="p-3">
-              <h3 className="font-semibold">{p.title}</h3>
-              <div className="bg-gray-200 h-2 mt-2 rounded">
+              className=""
+              />
+            <div className="">
+              <h3 className="title">{p.title}</h3>
+              <div className="progressBar">
                 <div
-                  className="bg-blue-500 h-2 rounded"
+                  className=""
                   style={{ width: `${p.progress}%` }}
-                ></div>
+                  ></div>
               </div>
-              <p className="text-sm text-gray-500 mt-1">{p.progress.toFixed(1)}% done</p>
+              <p className="">{p.progress.toFixed(1)}% done</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="flex justify-center mt-6">
+      <div className="">
         <button
           onClick={() => setShowModal(true)}
-          className="bg-green-500 text-white px-4 py-2 rounded-md"
-        >
+          className=""
+          >
           + Add Playlist
         </button>
       </div>
 
       {showModal && <AddPlaylist onClose={() => setShowModal(false)} />}
     </div>
+          </div>
   );
 
            </>
