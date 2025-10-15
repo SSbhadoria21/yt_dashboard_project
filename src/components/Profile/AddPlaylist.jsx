@@ -5,6 +5,7 @@ import { fetchPlaylistVideos } from "../Services/youtubeApi";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+import './AddPlaylist.css'
 const AddPlaylist = ({ onClose }) => {
   const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,34 +50,41 @@ const AddPlaylist = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-2xl w-[400px]">
-        <h2 className="text-xl font-semibold mb-4 text-center">
+    <>
+   
+      <div className="fixed inset-0 bg-black bg-opacity-60 ">
+      <div className=" input-main p-6 rounded-2xl ">
+        <h2 className="text-xl mb-4 text-center">
           Add New Playlist
         </h2>
         <input
+        
           type="text"
           value={link}
           onChange={(e) => setLink(e.target.value)}
           placeholder="Paste YouTube playlist link"
-          className="w-full border p-2 rounded-md mb-4"
+          className="w-full border  link-paste p-2 mb-4"
         />
-        <button
+       <div className="btns">
+         <button
           onClick={handleGenerate}
           disabled={loading}
-          className="w-full bg-blue-500 text-white py-2 rounded-md"
+          className=" bg-blue-500 generate text-white py-2 "
         >
           {loading ? "Generating..." : "Generate Dashboard"}
         </button>
         <button
           onClick={onClose}
-          className="w-full mt-2 border py-2 rounded-md"
+          className="cancel mt-2 border py-2"
         >
           Cancel
         </button>
+       </div>
       </div>
     </div>
+   
+    </>
   );
-};
+}
 
 export default AddPlaylist;
