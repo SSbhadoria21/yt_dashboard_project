@@ -52,7 +52,7 @@ const AddPlaylist = ({ onClose }) => {
   return (
     <>
    
-      <div className="fixed inset-0 bg-black bg-opacity-60 ">
+      <div className="fixed h-full w-full inset-0 bg-black bg-opacity-60 ">
       <div className=" input-main p-6 rounded-2xl ">
         <h2 className="text-xl mb-4 text-center">
           Add New Playlist
@@ -75,7 +75,7 @@ const AddPlaylist = ({ onClose }) => {
         </button>
         <button
           onClick={onClose}
-          className="cancel mt-2 border py-2"
+          className="cancel mt-2 border py-2 text-white"
         >
           Cancel
         </button>

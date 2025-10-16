@@ -9,9 +9,9 @@ const Home = () => {
   const [showMenu,setShowMenu] = useState(false);
   return (
     <>
-    <div className='mainHome'>
+    {/* <div className='mainHome'>
 
-    <div className='top_image'>
+    <div className='top_image'> */}
   <div className="home-full">
         <nav className="navbar">
         <div className="nav-left">
