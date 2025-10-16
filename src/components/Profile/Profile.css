@@ -53,6 +53,7 @@ body {
 /* Main Container */
 .main-this {
   display: flex;
+  margin-top: 30px;
   min-height: calc(100vh - 91px);
 }
 
@@ -237,7 +238,7 @@ body {
   margin-top: 25px;
 }
 
-.right button {
+/* .right button {
   background-color: #1a1a1a;
   color: #666;
   border: 2px dashed #333;
@@ -251,7 +252,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-}
+} */
 
 .right button:hover {
   border-color: #7b68ee;
