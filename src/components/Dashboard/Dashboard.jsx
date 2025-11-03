@@ -8,9 +8,9 @@
 
 
 
-
-
-
+import { YoutubeTranscript } from "youtube-transcript";
+import Groq from "groq-sdk";
+import jsPDF from "jspdf"; // for pdf generation
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -28,6 +28,11 @@ import { Youtube, CheckCircle, Circle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import "./Dashboard.css";
 
+  const client = new Groq({
+    apiKey: import.meta.env.VITE_GROQ_API_KEY,
+    dangerouslyAllowBrowser: true, // required for frontend use
+  });
+
 const Dashboard = () => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -42,6 +47,8 @@ const Dashboard = () => {
   const [target, setTarget] = useState(0);
   const [completedToday, setCompletedToday] = useState(0);
   const [showCongrats, setShowCongrats] = useState(false);
+  const [generatingNotes, setGeneratingNotes] = useState(null); // to track which video is generating notes
+
 
   // Fetch User Details
   useEffect(() => {
@@ -104,6 +111,115 @@ const Dashboard = () => {
       console.error("Error updating playlist progress: ", e);
     }
   };
+
+const generateNotes = async (videoTitle, transcriptText) => {
+  try {
+    const response = await client.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: "Summarize the given YouTube transcript into well-structured, readable study notes with bullet points and subheadings." },
+        { role: "user", content: `Video title: ${videoTitle}\nTranscript: ${transcriptText}` }
+      ]
+    });
+
+    const summary = response.choices[0]?.message?.content || "No summary generated.";
+
+    // ✅ Generate PDF
+    const doc = new jsPDF();
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(`Notes for: ${videoTitle}`, 10, 10);
+    doc.setFontSize(10);
+
+    // Split long text into multiple lines to avoid overflow
+    const splitText = doc.splitTextToSize(summary, 180);
+    doc.text(splitText, 10, 20);
+
+    // Save PDF file locally
+    const fileName = `${videoTitle.replace(/[^\w\s]/gi, "")}_Notes.pdf`;
+    doc.save(fileName);
+
+    alert("✅ Notes generated and downloaded as PDF!");
+
+    // ✅ (Optional) Save the summary text to Firestore "Your Notes"
+    await saveNotesToFirestore(videoTitle, summary);
+
+  } catch (error) {
+    console.error("Groq API Error:", error);
+    alert("Failed to generate notes. Try again.");
+  }
+};
+
+const saveNotesToFirestore = async (videoTitle, summaryText) => {
+  if (!user || !user.uid) return alert("Please log in to save notes.");
+
+  try {
+    const notesRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(notesRef);
+    const userData = userSnap.data();
+
+    // Create or update a "notes" array
+    const existingNotes = userData.notes || [];
+
+    const newNote = {
+      title: videoTitle,
+      summary: summaryText,
+      date: new Date().toISOString(),
+    };
+
+    await updateDoc(notesRef, {
+      notes: [...existingNotes, newNote],
+    });
+
+    console.log("Notes saved successfully!");
+  } catch (err) {
+    console.error("Error saving notes:", err);
+  }
+};
+
+
+  const handleGenerateNotes = async (video) => {
+  setGeneratingNotes(video.videoId);
+  try {
+    // send transcript or title to backend
+    const response = await fetch("http://localhost:5000/generate-notes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        transcript: video.title, // replace with video.description or transcript if available
+      }),
+    });
+
+    const data = await response.json();
+    const notes = data.notes || "No notes generated.";
+
+    // Generate PDF
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(`AI Notes for ${video.title}`, 10, 10);
+    doc.setFontSize(12);
+    const splitText = doc.splitTextToSize(notes, 180);
+    doc.text(splitText, 10, 20);
+    doc.save(`${video.title}-notes.pdf`);
+
+    // Store notes in localStorage
+    const existingNotes = JSON.parse(localStorage.getItem("notes") || "[]");
+    existingNotes.push({
+      videoTitle: video.title,
+      content: notes,
+      date: new Date().toLocaleString(),
+    });
+    localStorage.setItem("notes", JSON.stringify(existingNotes));
+
+    alert(`Notes generated for ${video.title}!`);
+  } catch (error) {
+    console.error("Error generating notes:", error);
+    alert("Failed to generate notes. Try again.");
+  } finally {
+    setGeneratingNotes(null);
+  }
+};
+
 
   // Logout
   const handleLogout = async () => {
@@ -304,6 +420,14 @@ const Dashboard = () => {
                 <p className={`status ${v.watched ? "completed" : "pending"}`}>
                   {v.watched ? "Completed" : "Pending"}
                 </p>
+
+                <button
+  onClick={() => generateNotes(v.title, v.transcript || "Transcript not available")}
+  className="notes-btn"
+>
+  Generate Notes
+</button>
+
               </div>
               <button
                 onClick={() => handleCheck(i)}
