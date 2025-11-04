@@ -11,6 +11,7 @@ import Register from './components/Register/Register.jsx'
 import Profile from './components/Profile/Profile.jsx'
 import { AuthProvider } from './components/context/AuthContext.jsx'
 import Dashboard from './components/Dashboard/Dashboard.jsx'
+import YourNotes from './components/YourNotes/YourNotes.jsx' 
 const router = createBrowserRouter(
   createRoutesFromElements(
     
@@ -24,6 +25,7 @@ const router = createBrowserRouter(
         <Route path='profile' element={<Profile/>}/>
         
         <Route path='dashboard/:id' element={<Dashboard/>}/>
+        <Route path='your-notes' element={<YourNotes/>}/> {/* ✅ NEW ROUTE */}
       </Route>
     
       
