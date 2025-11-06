@@ -1,17 +1,4 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState, useRef } from "react";
 import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useParams, useNavigate } from "react-router-dom";
@@ -27,8 +14,19 @@ import { ImHome } from "react-icons/im";
 import { Youtube, CheckCircle, Circle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import "./Dashboard.css";
+import { ensureWeekDoc, fetchWeekContributions, incrementContribution, decrementContributionSafely,} from "../Contributions";
+import { BarChart, Bar,
+ XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
 
 const Dashboard = () => {
+  const [contribData, setContribData] = useState([]);
+  const [loadingContrib, setLoadingContrib] = useState(true);
+
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -42,8 +40,10 @@ const Dashboard = () => {
   const [target, setTarget] = useState(0);
   const [completedToday, setCompletedToday] = useState(0);
   const [showCongrats, setShowCongrats] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectAll, setSelectAll] = useState(false);
+  const videoRefs = useRef([]);
 
-  // Fetch User Details
   useEffect(() => {
     if (!user || !user.uid) return;
     const fetchUserDetails = async () => {
@@ -58,7 +58,7 @@ const Dashboard = () => {
     fetchUserDetails();
   }, [user]);
 
-  // Fetch Playlist Data
+ 
   useEffect(() => {
     if (!user || !user.uid || !id) return;
     const fetchData = async () => {
@@ -81,6 +81,27 @@ const Dashboard = () => {
     fetchData();
   }, [user, id]);
 
+
+  useEffect(() => {
+    if (!user || !user.uid) return;
+
+    const loadContrib = async () => {
+      await ensureWeekDoc(user.uid);
+      const data = await fetchWeekContributions(user.uid);
+
+      const formatted = Object.keys(data)
+        .filter((day) =>
+          ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].includes(day)
+        )
+        .map((day) => ({ day, contributions: data[day] }));
+
+      setContribData(formatted);
+      setLoadingContrib(false);
+    };
+
+    loadContrib();
+  }, [user]);
+
   const handleCheck = async (index) => {
     if (!playlist) return;
     const updatedVideos = [...playlist.videos];
@@ -91,6 +112,21 @@ const Dashboard = () => {
 
     setPlaylist({ ...playlist, videos: updatedVideos, progress });
     setCompletedToday(watchedCount);
+
+    const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
+    if (updatedVideos[index].watched) {
+      await incrementContribution(user.uid, today, 1);
+    } else {
+      await decrementContributionSafely(user.uid, today, 1);
+    }
+
+    const data = await fetchWeekContributions(user.uid);
+    const formatted = Object.keys(data)
+      .filter((day) =>
+        ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].includes(day)
+      )
+      .map((day) => ({ day, contributions: data[day] }));
+    setContribData(formatted);
 
     if (target > 0 && watchedCount >= target) {
       setShowCongrats(true);
@@ -105,7 +141,46 @@ const Dashboard = () => {
     }
   };
 
-  // Logout
+  const handleSelectAll = async () => {
+    if (!playlist) return;
+    const newStatus = !selectAll;
+    setSelectAll(newStatus);
+
+    const updatedVideos = playlist.videos.map((v) => ({
+      ...v,
+      watched: newStatus,
+    }));
+    const watchedCount = updatedVideos.filter((v) => v.watched).length;
+    const totalCount = updatedVideos.length;
+    const progress = parseFloat(((watchedCount / totalCount) * 100).toFixed(1));
+
+    setPlaylist({ ...playlist, videos: updatedVideos, progress });
+
+    try {
+      const playlistRef = doc(db, "users", user.uid, "playlists", id);
+      await updateDoc(playlistRef, { videos: updatedVideos, progress });
+    } catch (e) {
+      console.error("Error updating select all:", e);
+    }
+  };
+
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    if (!isNaN(query) && query.trim() !== "") {
+      const index = parseInt(query, 10) - 1;
+      if (index >= 0 && videoRefs.current[index]) {
+        videoRefs.current[index].scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  };
+
+  const filteredVideos = playlist
+    ? playlist.videos.filter((v) =>
+        v.title.toLowerCase().includes(searchQuery)
+      )
+    : [];
+
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -118,7 +193,6 @@ const Dashboard = () => {
   const getThumbnailUrl = (videoId) =>
     `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
 
-  // Hours Calculation
   const totalHours = playlist
     ? playlist.videos.reduce((acc, v) => acc + (v.duration || 1), 0)
     : 0;
@@ -126,7 +200,6 @@ const Dashboard = () => {
     ? playlist.videos.filter((v) => v.watched).reduce((acc, v) => acc + (v.duration || 1), 0)
     : 0;
 
-  // Theme Toggle
   const toggleTheme = () => {
     setDarkMode(!darkMode);
     document.body.classList.toggle("light-theme");
@@ -139,8 +212,8 @@ const Dashboard = () => {
 
   return (
     <div className={`dashboard-container ${darkMode ? "dark" : "light"}`}>
-      {/* Navbar */}
-      <nav className="navbar">
+   
+ <nav className="navbar">
         <div className="nav-left">
           <img
             src={logo}
@@ -162,7 +235,7 @@ const Dashboard = () => {
         </div>
       </nav>
 
-      {/* Sidebar */}
+   
       <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <ImHome
           className="icon"
@@ -193,14 +266,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Congrats Popup */}
       {showCongrats && (
         <div className="popup">
           🎉 Congratulations! Your Today's Target is Completed!
         </div>
       )}
 
-      {/* Fullscreen Menu */}
       {showMenu && (
         <div className="fullscreen-menu">
           <button className="close-btn" onClick={() => setShowMenu(false)}>
@@ -211,19 +282,19 @@ const Dashboard = () => {
             <li onClick={() => navigate("/profile")}>Your Profile</li>
             <li>Benefits</li>
             <li>About Us</li>
+            <li onClick={handleLogout}>Logout</li>
           </ul>
         </div>
       )}
-
-      {/* Main Section */}
+    
       <div className="main-section">
         <div className="profile-icon">
           <FaUser />
         </div>
         <h1 className="playlist-title text-white">{playlist.title}</h1>
 
-        {/* To-Do Target */}
-        <div className="todo-box">
+   
+ <div className="todo-box">
           <p>🎯 Set Your Daily Target:</p>
           <input
             type="number"
@@ -235,8 +306,7 @@ const Dashboard = () => {
             Completed Today: {completedToday}/{target}
           </p>
         </div>
-
-        {/* Dashboard Stats */}
+        
         <div className="dashboard-stats">
           <div className="stat-box progress">
             <h3>Total Progress</h3>
@@ -251,11 +321,20 @@ const Dashboard = () => {
 
           <div className="stat-box graph">
             <h3>Contribution Graph</h3>
-            <img
-              src="https://quickchart.io/chart?c={type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Videos',data:[10,20,30,40,30,20,40],borderColor:'purple',fill:false},{label:'Revision',data:[5,10,25,35,20,25,30],borderColor:'orange',fill:false}]}}"
-              alt="graph"
-              className="graph-img"
-            />
+           {loadingContrib ? (
+  <p>Loading graph...</p>
+) : (
+  <ResponsiveContainer width="100%" height={173}>
+    <BarChart data={contribData}>
+      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+      <XAxis dataKey="day" stroke="#fff" />
+      <YAxis stroke="#fff" />
+      <Tooltip />
+      <Bar dataKey="contributions" fill="#a855f7" radius={[10, 10, 0, 0]} />
+    </BarChart>
+  </ResponsiveContainer>
+)}
+
           </div>
 
           <div className="stat-box hours">
@@ -276,21 +355,30 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Video List */}
+        <div className="filter-container">
+          <input
+            type="text"
+            placeholder="Search by video number or title..."
+            className="search-bar"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+          <button className="select-btn" onClick={handleSelectAll}>
+            {selectAll ? "Deselect All" : "Select All"}
+          </button>
+        </div>
+    
         <div className="video-list">
-          {playlist.videos.map((v, i) => (
+          {filteredVideos.map((v, i) => (
             <div
               key={v.videoId}
+              ref={(el) => (videoRefs.current[i] = el)}
               className={`video-card ${v.watched ? "watched" : ""}`}
             >
               <img
                 src={getThumbnailUrl(v.videoId)}
                 alt={v.title}
                 className="video-thumb"
-                onError={(e) => {
-                  e.target.src =
-                    "https://placehold.co/320x180/2c3e50/ecf0f1?text=No+Thumb";
-                }}
               />
               <div className="video-info">
                 <a

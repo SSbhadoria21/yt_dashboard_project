@@ -2,7 +2,6 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import React,{useState} from "react";
 import "./Login.css"
 import { Link } from "react-router";
-import { ToastContainer } from "react-toastify";
 import '../Home/photo.jpg'
 import photo from '../Home/photo.jpg'
 import logo from '../assets/crucible.jpeg'

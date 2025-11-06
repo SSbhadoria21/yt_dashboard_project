@@ -1,53 +1,58 @@
-import React,{useEffect, useState} from 'react'
+
+import React, { use, useEffect, useState } from "react";
 import { HiWrenchScrewdriver } from "react-icons/hi2";
 import { CgDarkMode } from "react-icons/cg";
 import { FaBox } from "react-icons/fa";
 import { MdOutlineCheckBox } from "react-icons/md";
 import { IoChevronBackOutline } from "react-icons/io5";
+import { IoIosArrowBack } from "react-icons/io";
 import { FaRegUser } from "react-icons/fa";
 import { ImHome } from "react-icons/im";
-import {auth,db} from '../firebase'
-import {collection,doc,getDoc,getDocs} from 'firebase/firestore'
-import './Profile.css'
-import { BiFoodMenu } from "react-icons/bi";
-import { FaScrewdriverWrench } from "react-icons/fa6";
-import AddPlaylist from './AddPlaylist'
-import { Navigate, useNavigate } from 'react-router';
+import { auth, db } from "../firebase";
 import {
-  IoIosArrowBack,
-} from "react-icons/io";
-import logo from '../assets/crucible.jpeg'
-import { useAuth } from '../context/AuthContext';
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
+import "./Profile.css";
+import { FaScrewdriverWrench } from "react-icons/fa6";
+import AddPlaylist from "./AddPlaylist";
+import { useNavigate } from "react-router";
+import logo from "../assets/crucible.jpeg";
+import { useAuth } from "../context/AuthContext";
+import { FaTrashAlt } from "react-icons/fa";
 
 const Profile = () => {
-    const [userDetails,setUserDetails]=useState(null);
-      const [sidebarOpen, setSidebarOpen] = useState(false);
-    
-    const {user } = useAuth();
-      const Navigate = useNavigate();
-      const [playlists, setPlaylists] = useState([]);
+  const [userDetails, setUserDetails] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [playlists, setPlaylists] = useState([]);
   const [showModal, setShowModal] = useState(false);
-const fetchUserDetails= async()=>{
-    auth.onAuthStateChanged(async (user) =>{
-        console.log(user);
-       
-        const docref = doc(db,"users",user.uid);
-        const docSnap = await getDoc(docref);
-        if(docSnap.exists()){
-            console.log("Document data:", docSnap.data());
-            setUserDetails(docSnap.data());
-        }else{
-            console.log("No such document!");
-        }
-        
-    })
-}
-const toggleTheme = () => {
+  const [darkMode, setDarkMode] = useState(true);
+  const [deletingId, setDeletingId] = useState(null); 
+
+  const fetchUserDetails = async () => {
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) return;
+      const docref = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docref);
+      if (docSnap.exists()) {
+        setUserDetails(docSnap.data());
+      }
+    });
+  };
+
+  const toggleTheme = () => {
     setDarkMode(!darkMode);
     document.body.classList.toggle("light-theme");
   };
+
   useEffect(() => {
     const fetchPlaylists = async () => {
+      if (!user) return;
       const userRef = doc(db, "users", user.uid);
       const playlistsRef = collection(userRef, "playlists");
       const snapshot = await getDocs(playlistsRef);
@@ -56,73 +61,63 @@ const toggleTheme = () => {
     fetchPlaylists();
   }, [user]);
 
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
 
-useEffect(()=>{
-fetchUserDetails();
-},[])
-async function handleLogout() {
+  const handleDeletePlaylist = async (playlistId, title) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the playlist "${title}"?`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      setDeletingId(playlistId);
+      const playlistRef = doc(db, "users", user.uid, "playlists", playlistId);
+      await deleteDoc(playlistRef);
+      setPlaylists((prev) => prev.filter((p) => p.id !== playlistId));
+      setDeletingId(null);
+    } catch (error) {
+      console.error("Error deleting playlist:", error);
+      setDeletingId(null);
+    }
+  };
+
+  async function handleLogout() {
     try {
       await auth.signOut();
       window.location.href = "/login";
-      console.log("User logged out successfully!");
     } catch (error) {
       console.error("Error logging out:", error.message);
     }
   }
+
+  if (!userDetails) return <div>Loading...</div>;
+
   return (
-    <div>
-        {userDetails ? (
-           <>
-           {/* <div style={{ display: "flex" }}>
+   <>
+   {userDetails ? (
+     <>
+      <div>
+      <div className="header">
+        <nav>
+          <div className="nav1">
+            <img width={50} src={logo} alt="" />
+            <h1>Crucible</h1>
+          </div>
+          <div className="nav2">
             <img
-              src={userDetails.photo}
-              width={50}
-              style={{ borderRadius: "50%" }}
+              width={60}
+              height={60}
+              src="https://freedesignfile.com/image/preview/19038/xbox-controller-gamepad-drawing-black-and-white-clipart.png"
+              alt=""
             />
           </div>
-            <h3>Welcome {userDetails.fname}</h3>
-            <div>
-                <p>First Name: {userDetails.fname}</p>
-                <p>Last Name: {userDetails.lname}</p>
-                <p>Email: {userDetails.email}</p>
-            </div>
-            <button onClick={handleLogout}> Logout </button> */}
-            <div className="header">
-<nav>
-    <div className="nav1">
-         <img width={50} src={logo} alt="" /><h1>Crucible</h1>
-         </div>
-    <div className="nav2"> 
-        <img width={60} height={60} src="https://freedesignfile.com/image/preview/19038/xbox-controller-gamepad-drawing-black-and-white-clipart.png" alt="" />
-        </div>
-</nav>
-        </div>
-      
+          
+        </nav>
+      </div>
 
-
-( <div className='main-this'>
-  {/* <div className='top'>
-    <ImHome />
-    <div>
-      <FaRegUser />
-    </div>
-  </div> */}
-{/* <div className='left'>
-  <div className='left-top'>
-
-  <ImHome />
-  <IoChevronBackOutline />
-  <MdOutlineCheckBox />
-  <FaBox />
-  <CgDarkMode />
-  </div>
-  <div className='left-btm'>
-    <HiWrenchScrewdriver />
-  </div>
-</div> */}
-
-//sidebar
- <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+      <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <ImHome
           className="icon"
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -141,6 +136,7 @@ async function handleLogout() {
             <FaBox className="icon" />
             {sidebarOpen && <span>Your Notes</span>}
           </div>
+          
           <div onClick={toggleTheme}>
             <CgDarkMode className="icon" />
             {sidebarOpen && <span>Appearance</span>}
@@ -149,63 +145,69 @@ async function handleLogout() {
             <FaScrewdriverWrench className="icon" />
             {sidebarOpen && <span>Settings</span>}
           </div>
+          
         </div>
       </div>
 
-    <div className='right'>
-      <h1 className="text-2xl font-bold mb-4 text-white headingYP">Your Playground
-        <FaRegUser />
-      </h1>
+      <div className="right  2">
+        <h1 className="text-2xl font-bold mb-4 text-white headingYP margin">
+          Your Playground
+          
+          
+        <div className="username"> 
+          
+          Hello ! {userDetails.fname}
 
-      <div className="thumbnails">
-        {playlists.map((p) => (
-          <div
-          key={p.id}
-          onClick={() => Navigate(`/dashboard/${p.id}`)}
-          className="cursor-pointer hover:shadow-lg transition oneBox"
-          >
-            <img
-              src={p.thumbnail}
-              alt={p.title}
-              className=""
-              />
-            <div className="">
-              <h3 className="title">{p.title}</h3>
-              <div className="progressBar">
-                <div
-                  className=""
-                  style={{ width: `${p.progress}%` }}
-                  ></div>
+        </div>
+        </h1>
+    
+        <div className="thumbnails">
+          {playlists.map((p) => (
+            <div key={p.id} className="oneBox">
+              <div
+                className="playlist-card"
+                onClick={() => navigate(`/dashboard/${p.id}`)}
+              >
+                <img src={p.thumbnail} alt={p.title} />
+                <div>
+                  <h3 className="title">{p.title}</h3>
+                  <div className="progressBar">
+                    <div style={{ width: `${p.progress}%` }}></div>
+                  </div>
+                  <p>{p.progress.toFixed(1)}% done</p>
+                </div>
               </div>
-              <p className="">{p.progress.toFixed(1)}% done</p>
+
+              <button
+                className="delete-btn"
+                onClick={(e) => {
+                  e.stopPropagation(); // stop navigation
+                  handleDeletePlaylist(p.id, p.title);
+                }}
+                disabled={deletingId === p.id}
+              >
+                {deletingId === p.id ? "Deleting..." : <FaTrashAlt />}
+              </button>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div className="">
-        <button
-          onClick={() => setShowModal(true)}
-          className=""
-          >
-          {/* className="bg-green-500 text-white px-4 py-2 rounded-md "
-        > */}
-          + Add Playlist
-        </button>
-      </div>
+        <div className="add-playlist-section">
+          <button onClick={() => setShowModal(true)} className="add-btn">
+            + Add Playlist
+          </button>
+        </div>
 
-      {showModal && <AddPlaylist onClose={() => setShowModal(false)} />}
+        {showModal && <AddPlaylist onClose={() => setShowModal(false)} />}
+      </div>
     </div>
-          </div>
+     </>
+       
+      ) : ( 
+        <div>Loading....</div>
+         )}
+   </>
   );
+};
 
-           </>
-        ) : (
-            <div>Loading....</div>
-        )}
-    </div>
-   
-  )
-}
-
-export default Profile
+export default Profile;
