@@ -3,6 +3,19 @@
 
 
 
+// import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+// import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { db, auth } from "../firebase"; // make sure these are imported
+import jsPDF from "jspdf";
+// import { jsPDF } from "jspdf";
+import { collection, addDoc } from "firebase/firestore";
+import { YoutubeTranscript } from "youtube-transcript";
+import Groq from "groq-sdk";
+// import jsPDF from "jspdf"; // for pdf generation
+import React, { useEffect, useState } from "react";
+// import { auth, db } from "../firebase";
+// import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 
 
@@ -28,6 +41,11 @@ import { Youtube, CheckCircle, Circle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import "./Dashboard.css";
 
+  const client = new Groq({
+    apiKey: import.meta.env.VITE_GROQ_API_KEY,
+    dangerouslyAllowBrowser: true, // required for frontend use
+  });
+
 const Dashboard = () => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -42,6 +60,8 @@ const Dashboard = () => {
   const [target, setTarget] = useState(0);
   const [completedToday, setCompletedToday] = useState(0);
   const [showCongrats, setShowCongrats] = useState(false);
+  const [generatingNotes, setGeneratingNotes] = useState(null); // to track which video is generating notes
+
 
   // Fetch User Details
   useEffect(() => {
@@ -61,6 +81,7 @@ const Dashboard = () => {
   // Fetch Playlist Data
   useEffect(() => {
     if (!user || !user.uid || !id) return;
+    console.log("Fetching playlist for user:", user?.uid, "with id:", id);
     const fetchData = async () => {
       try {
         const playlistRef = doc(db, "users", user.uid, "playlists", id);
@@ -104,6 +125,120 @@ const Dashboard = () => {
       console.error("Error updating playlist progress: ", e);
     }
   };
+
+async function generateNotes(videoTitle, promptText) {
+  try {
+    // Ask Groq for the summary
+    const response = await client.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an educational AI that converts YouTube content into structured study notes. Use bullet points, bold keywords, and clear formatting.",
+        },
+        {
+          role: "user",
+          content: promptText,
+        },
+      ],
+    });
+
+    const summary = response.choices[0]?.message?.content || "No summary generated.";
+    console.log("AI Summary:", summary);
+
+    // 1️⃣ Generate PDF
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(videoTitle, pageWidth / 2, 20, { align: "center" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    const splitText = doc.splitTextToSize(summary, pageWidth - 20);
+    doc.text(splitText, 10, 35);
+
+    // Save locally (download)
+    const pdfBlob = doc.output("blob");
+
+    // Optional: download to user’s computer
+    doc.save(`${videoTitle}_Notes.pdf`);
+
+    // 2️⃣ Save in Firestore
+    const noteRef = collection(db, "users", user.uid, "notes");
+    await addDoc(noteRef, {
+      title: videoTitle,
+      content: summary,
+      createdAt: new Date(),
+    });
+
+    alert("✅ Notes generated and saved successfully!");
+
+  } catch (error) {
+    console.error("Groq API Error:", error);
+    alert("Failed to generate notes. Check console for details.");
+  }
+}
+
+
+
+const saveNotesToFirestore = async (videoTitle, summaryText) => {
+  if (!user || !user.uid) return alert("Please log in to save notes.");
+
+  try {
+    const notesRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(notesRef);
+    const userData = userSnap.data();
+
+    // Create or update a "notes" array
+    const existingNotes = userData.notes || [];
+
+    const newNote = {
+      title: videoTitle,
+      summary: summaryText,
+      date: new Date().toISOString(),
+    };
+
+    await updateDoc(notesRef, {
+      notes: [...existingNotes, newNote],
+    });
+
+    console.log("Notes saved successfully!");
+  } catch (err) {
+    console.error("Error saving notes:", err);
+  }
+};
+
+
+const handleGenerateNotes = async (videoId, title) => {
+  try {
+    // Try to fetch transcript
+    let transcriptText = "";
+    try {
+      const transcriptArray = await YoutubeTranscript.fetchTranscript(videoId);
+      transcriptText = transcriptArray.map((item) => item.text).join(" ");
+      console.log("Transcript fetched successfully!");
+    } catch (err) {
+      console.warn("Transcript not available, falling back to title only.");
+    }
+
+    // If transcript is available, use it.
+    // If not, tell Groq to summarize based on title/context.
+    const prompt = transcriptText
+      ? `Summarize the following YouTube lecture into clear study notes with bullet points, key terms, and examples:\n\n${transcriptText}`
+      : `The YouTube video titled "${title}" doesn’t have a transcript. Write a helpful, detailed summary of what this topic usually covers and what students should note while studying it.`;
+
+    await generateNotes(title, prompt);
+  } catch (error) {
+    console.error("Error generating notes:", error);
+    alert("Failed to generate notes. Check console for details.");
+  }
+};
+
+
+
 
   // Logout
   const handleLogout = async () => {
@@ -178,6 +313,11 @@ const Dashboard = () => {
             <MdOutlineCheckBox className="icon" />
             {sidebarOpen && <span>To-Do</span>}
           </div>
+          <div onClick={() => navigate("/your-notes")}>
+  <FaBox className="icon" />
+  {sidebarOpen && <span>Your Notes</span>}
+</div>
+
           <div>
             <FaBox className="icon" />
             {sidebarOpen && <span>Your Notes</span>}
@@ -304,6 +444,16 @@ const Dashboard = () => {
                 <p className={`status ${v.watched ? "completed" : "pending"}`}>
                   {v.watched ? "Completed" : "Pending"}
                 </p>
+
+                <button
+  onClick={() => handleGenerateNotes(v.videoId, v.title)}
+  className="notes-btn"
+>
+  Generate Notes
+</button>
+
+
+
               </div>
               <button
                 onClick={() => handleCheck(i)}
