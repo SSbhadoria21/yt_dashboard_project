@@ -767,28 +767,3 @@ body.light-theme {
     width: 90%;
   }
 }
-
-
-
-
-.notes-btn {
-  margin-top: 8px;
-  padding: 6px 10px;
-  background-color: #7d3cff;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.2s;
-}
-
-.notes-btn:hover {
-  background-color: #9c6bff;
-}
-
-.notes-btn:disabled {
-  background-color: #999;
-  cursor: not-allowed;
-}
-

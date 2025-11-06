@@ -16,6 +16,17 @@ import Groq from "groq-sdk";
 import React, { useEffect, useState } from "react";
 // import { auth, db } from "../firebase";
 // import { doc, getDoc, updateDoc } from "firebase/firestore";
+
+
+
+
+
+
+
+
+import React, { useEffect, useState } from "react";
+import { auth, db } from "../firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   IoIosArrowBack,
@@ -307,6 +318,10 @@ const handleGenerateNotes = async (videoId, title) => {
   {sidebarOpen && <span>Your Notes</span>}
 </div>
 
+          <div>
+            <FaBox className="icon" />
+            {sidebarOpen && <span>Your Notes</span>}
+          </div>
           <div onClick={toggleTheme}>
             <CgDarkMode className="icon" />
             {sidebarOpen && <span>Appearance</span>}
