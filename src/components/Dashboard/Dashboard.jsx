@@ -1,11 +1,30 @@
-import  { useEffect, useState, useRef } from "react";
-import { auth, db } from "../firebase";
+import  {   useRef } from "react";
+
+import { db} from "../firebase"; 
+import jsPDF from "jspdf";
+// import { jsPDF } from "jspdf";
+import { collection, addDoc } from "firebase/firestore";
+import { YoutubeTranscript } from "youtube-transcript";
+import Groq from "groq-sdk";
+// import jsPDF from "jspdf"; // for pdf generation
+// import { auth, db } from "../firebase";
+// import { doc, getDoc, updateDoc } from "firebase/firestore";
+import clogo from '../assets/ultaclogo.jpeg'
+
+
+
+
+
+
+
+import { useEffect, useState } from "react";
+import { auth} from "../firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   IoIosArrowBack,
 } from "react-icons/io";
-import logo from '../assets/crucible.jpeg'
+
 import { MdOutlineCheckBox } from "react-icons/md";
 import { FaBox, FaUser } from "react-icons/fa";
 import { CgDarkMode } from "react-icons/cg";
@@ -22,6 +41,11 @@ import { BarChart, Bar,
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
+
+  const client = new Groq({
+    apiKey: import.meta.env.VITE_GROQ_API_KEY,
+    dangerouslyAllowBrowser: true, 
+  });
 
 const Dashboard = () => {
   const [contribData, setContribData] = useState([]);
@@ -43,6 +67,8 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectAll, setSelectAll] = useState(false);
   const videoRefs = useRef([]);
+  const [generatingNotes, setGeneratingNotes] = useState(null); 
+
 
   useEffect(() => {
     if (!user || !user.uid) return;
@@ -61,6 +87,7 @@ const Dashboard = () => {
  
   useEffect(() => {
     if (!user || !user.uid || !id) return;
+    console.log("Fetching playlist for user:", user?.uid, "with id:", id);
     const fetchData = async () => {
       try {
         const playlistRef = doc(db, "users", user.uid, "playlists", id);
@@ -181,6 +208,114 @@ const Dashboard = () => {
       )
     : [];
 
+async function generateNotes(videoTitle, promptText) {
+  try {
+  
+    const response = await client.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an educational AI that converts YouTube content into structured study notes. Use bullet points, bold keywords, and clear formatting.",
+        },
+        {
+          role: "user",
+          content: promptText,
+        },
+      ],
+    });
+
+    const summary = response.choices[0]?.message?.content || "No summary generated.";
+    console.log("AI Summary:", summary);
+
+ 
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(videoTitle, pageWidth / 2, 20, { align: "center" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    const splitText = doc.splitTextToSize(summary, pageWidth - 20);
+    doc.text(splitText, 10, 35);
+
+
+    const pdfBlob = doc.output("blob");
+
+ 
+    doc.save(`${videoTitle}_Notes.pdf`);
+
+ 
+    const noteRef = collection(db, "users", user.uid, "notes");
+    await addDoc(noteRef, {
+      title: videoTitle,
+      content: summary,
+      createdAt: new Date(),
+    });
+
+    alert("✅ Notes generated and saved successfully!");
+
+  } catch (error) {
+    console.error("Groq API Error:", error);
+    alert("Failed to generate notes. Check console for details.");
+  }
+}
+
+
+
+const saveNotesToFirestore = async (videoTitle, summaryText) => {
+  if (!user || !user.uid) return alert("Please log in to save notes.");
+
+  try {
+    const notesRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(notesRef);
+    const userData = userSnap.data();
+
+
+    const existingNotes = userData.notes || [];
+
+    const newNote = {
+      title: videoTitle,
+      summary: summaryText,
+      date: new Date().toISOString(),
+    };
+
+    await updateDoc(notesRef, {
+      notes: [...existingNotes, newNote],
+    });
+
+    console.log("Notes saved successfully!");
+  } catch (err) {
+    console.error("Error saving notes:", err);
+  }
+};
+
+
+const handleGenerateNotes = async (videoId, title) => {
+  try {
+  
+    let transcriptText = "";
+    try {
+      const transcriptArray = await YoutubeTranscript.fetchTranscript(videoId);
+      transcriptText = transcriptArray.map((item) => item.text).join(" ");
+      console.log("Transcript fetched successfully!");
+    } catch (err) {
+      console.warn("Transcript not available, falling back to title only.");
+    }
+
+    const prompt = transcriptText
+      ? `Summarize the following YouTube lecture into clear study notes with bullet points, key terms, and examples:\n\n${transcriptText}`
+      : `The YouTube video titled "${title}" doesn’t have a transcript. Write a helpful, detailed summary of what this topic usually covers and what students should note while studying it.`;
+
+    await generateNotes(title, prompt);
+  } catch (error) {
+    console.error("Error generating notes:", error);
+    alert("Failed to generate notes. Check console for details.");
+  }
+};
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -216,7 +351,7 @@ const Dashboard = () => {
  <nav className="navbar">
         <div className="nav-left">
           <img
-            src={logo}
+            src={clogo}
             alt="logo"
             className="logo"
           />
@@ -251,10 +386,15 @@ const Dashboard = () => {
             <MdOutlineCheckBox className="icon" />
             {sidebarOpen && <span>To-Do</span>}
           </div>
-          <div>
+          <div onClick={() => navigate("/your-notes")}>
+  <FaBox className="icon" />
+  {sidebarOpen && <span>Your Notes</span>}
+</div>
+
+          {/* <div>
             <FaBox className="icon" />
             {sidebarOpen && <span>Your Notes</span>}
-          </div>
+          </div> */}
           <div onClick={toggleTheme}>
             <CgDarkMode className="icon" />
             {sidebarOpen && <span>Appearance</span>}
@@ -280,8 +420,7 @@ const Dashboard = () => {
           <ul>
             <li onClick={() => navigate("/")}>Home</li>
             <li onClick={() => navigate("/profile")}>Your Profile</li>
-            <li>Benefits</li>
-            <li>About Us</li>
+       <li onClick={()=> navigate("/login")}>Switch Account</li>
             <li onClick={handleLogout}>Logout</li>
           </ul>
         </div>
@@ -392,6 +531,16 @@ const Dashboard = () => {
                 <p className={`status ${v.watched ? "completed" : "pending"}`}>
                   {v.watched ? "Completed" : "Pending"}
                 </p>
+
+                <button
+  onClick={() => handleGenerateNotes(v.videoId, v.title)}
+  className="notes-btn"
+>
+  Generate Notes
+</button>
+
+
+
               </div>
               <button
                 onClick={() => handleCheck(i)}

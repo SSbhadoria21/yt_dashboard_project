@@ -580,3 +580,13 @@ body.light-theme {
     width: 100%;
   }
 }
+.notes-btn{
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}

@@ -42,6 +42,8 @@
 .home-full{
   width: 100%;
  height: 100%;
+
+
 }
 .top-image{
   width: 100%;
@@ -97,7 +99,7 @@ font-family: "Agrandir";
 align-items: center;
 justify-content: center;
   height: 80vh;
-
+  /* background-color: red; */
 }
 .videos{
 width: 70%;
@@ -148,14 +150,105 @@ height: 60vh;
 }
 
 
+.benefits-section {
+  width: 100%;
+  padding: 100px 0;
+  background: linear-gradient(180deg, #080808 0%, #121212 100%);
+  color: #fff;
+  font-family: "Agrandir";
+  text-align: center;
+  overflow: hidden;
+}
 
+.benefit-heading {
+  font-size: 2.8rem;
+  color: #ff10f0;
+  margin-bottom: 50px;
+  font-family: "cmu";
+  text-shadow: 0 0 15px #ff10f0;
+}
 
+.carousel-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
 
+.carousel-track {
+  display: flex;
+  gap: 2rem;
+  width: max-content;
+  animation: scrollCarousel 28s linear infinite;
+}
 
+@keyframes scrollCarousel {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
 
+.benefit-card {
+  flex: 0 0 340px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(255, 16, 240, 0.3);
+  padding: 30px;
+  text-align: center;
+  transition: all 0.4s ease;
+}
 
+.benefit-card:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 35px rgba(255, 16, 240, 0.5);
+}
 
+.benefit-card h3 {
+  color: #ff33cc;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
 
+.benefit-card p {
+  font-size: 1rem;
+  color: #e0e0e0;
+  line-height: 1.6;
+}
 
+.about-section {
+  background: radial-gradient(circle at top, #0a0a0a, #050505);
+  color: #fff;
+  text-align: center;
+  padding: 100px 10%;
+  font-family: "Agrandir";
+  animation: fadeIn 2s ease;
+}
 
+.about-text h2 {
+  font-size: 2.8rem;
+  color: #ff10f0;
+  margin-bottom: 25px;
+  /* text-shadow: 0 0 10px #ff10f0; */
+}
 
+.about-text p {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #e0e0e0;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

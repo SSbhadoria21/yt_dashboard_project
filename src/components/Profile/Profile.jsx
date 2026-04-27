@@ -9,6 +9,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { FaRegUser } from "react-icons/fa";
 import { ImHome } from "react-icons/im";
 import { auth, db } from "../firebase";
+import clogo from '../assets/ultaclogo.jpeg'
 import {
   collection,
   doc,
@@ -102,7 +103,7 @@ const Profile = () => {
       <div className="header">
         <nav>
           <div className="nav1">
-            <img width={50} src={logo} alt="" />
+            <img width={50} src={clogo} alt="" />
             <h1>Crucible</h1>
           </div>
           <div className="nav2">

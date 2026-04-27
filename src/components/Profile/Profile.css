@@ -408,13 +408,13 @@ body {
 }
 .username{
   margin-top: 10px;
-  font-size: 1.8rem;
+  font-size: 1.1rem;
   font-weight: 500;
  background: linear-gradient(90deg, #ff00ff, #00ffff);
   border-radius: 5px;
   font-weight: bold;
   display: flex;
-  width: 23%;
+
   color: black;
   justify-content: center;
   margin-top: 5px;
