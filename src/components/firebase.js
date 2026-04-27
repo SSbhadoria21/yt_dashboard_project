@@ -4,7 +4,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAJJuE-45WLBPMftpGd4IQxlLgxVYMsdb8",
+  apiKey: import.meta.env.VITE_FIREBASE_API,
   authDomain: "yt-dashboard-72ae0.firebaseapp.com",
   projectId: "yt-dashboard-72ae0",
   storageBucket: "yt-dashboard-72ae0.firebasestorage.app",
